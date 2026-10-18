@@ -1,0 +1,58 @@
+name: Publish the models
+
+# Fetch KiCad's official 3D models (kicad-packages3D) from GitLab, gzip every STEP file and
+# publish them on GitHub Pages for FerroEDA's web app:
+#   https://pivotremy.github.io/ferroeda-3dmodels/<lib>.3dshapes/<name>.step.gz
+# Runs every week (the library changes slowly) and on demand.
+on:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the models (STEP only)
+        run: |
+          git clone --depth 1 --filter=blob:none --no-checkout https://gitlab.com/kicad/libraries/kicad-packages3D.git src
+          git -C src sparse-checkout set --no-cone '/*.md' '*.step' '*.stp'
+          git -C src checkout
+          git -C src log -1 --format='%H %cI' > revision.txt
+      - name: Gzip into the site
+        run: |
+          mkdir -p site
+          (cd src && find . -type f \( -iname '*.step' -o -iname '*.stp' \) -print0) | while IFS= read -r -d '' f; do
+            mkdir -p "site/$(dirname "$f")"
+            gzip -9 -n -c "src/$f" > "site/$f.gz"
+          done
+          cp src/LICENSE.md site/LICENSE.md
+          cp README.md revision.txt site/
+          touch site/.nojekyll
+          find site -name '*.gz' | wc -l
+          du -sh site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
