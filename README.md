@@ -2,10 +2,10 @@
 
 This repository holds no models itself: its workflow takes KiCad's official 3D model library
 ([kicad-packages3D](https://gitlab.com/kicad/libraries/kicad-packages3D)), gzips every STEP
-file and publishes them on GitHub Pages, where [FerroEDA](https://github.com/pivotremy/ferroeda)'s
+file and publishes them on GitHub Pages, where [FerroEDA](https://github.com/ferroeda/ferroeda)'s
 browser app loads them:
 
-    https://pivotremy.github.io/ferroeda-3dmodels/<library>.3dshapes/<model>.step.gz
+    https://ferroeda.github.io/ferroeda-3dmodels/<library>.3dshapes/<model>.step.gz
 
 The files are unchanged apart from the gzip compression. `revision.txt` on the site gives the
 kicad-packages3D commit they come from.

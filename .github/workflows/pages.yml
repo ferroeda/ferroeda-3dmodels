@@ -2,7 +2,7 @@ name: Publish the models
 
 # Fetch KiCad's official 3D models (kicad-packages3D) from GitLab, gzip every STEP file and
 # publish them on GitHub Pages for FerroEDA's web app:
-#   https://pivotremy.github.io/ferroeda-3dmodels/<lib>.3dshapes/<name>.step.gz
+#   https://ferroeda.github.io/ferroeda-3dmodels/<lib>.3dshapes/<name>.step.gz
 # Runs every week (the library changes slowly) and on demand.
 on:
   schedule:
